@@ -32,10 +32,8 @@ def processMblog(mblog):
 
 
 def cleanText(text):
-    tag_list = ['span', 'a', 'div', 'p']
-    for tag in tag_list:
-        text = re.sub('<%s.+?</%s>' % (tag, tag), '', text)
     text = re.sub('<br.*?>', '\n', text)
+    text = re.sub('<.+?>', '', text)
     return text
 
 
