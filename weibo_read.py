@@ -5,15 +5,17 @@ import requests
 import re
 import sys
 
+URL_ROOT = 'https://m.weibo.cn'
+
 
 def getCardList(uid):
-    url_start = "https://m.weibo.cn/api/container/getIndex?type=uid&value=%s" % (uid)
-    data = requests.get(url_start).json()
+    url = URL_ROOT + "/api/container/getIndex?type=uid&value=%s" % (uid)
+    data = requests.get(url).json()
     for tab in data['data']['tabsInfo']['tabs']:
         if tab['title'] == '微博':
             containerid = tab['containerid']
 
-    url = "%s&containerid=%s" % (url_start, containerid)
+    url = url + "&containerid=%s" % (containerid)
     data = requests.get(url).json()
     for card in data['data']['cards']:
         if card['card_type'] == 9:
@@ -24,7 +26,7 @@ def processMblog(mblog):
     if mblog['isLongText'] is False:
         return mblog['text']
     else:
-        url = "https://m.weibo.cn/statuses/extend?id=%s" % (mblog['id'])
+        url = URL_ROOT + "/statuses/extend?id=%s" % (mblog['id'])
         return requests.get(url).json()['data']['longTextContent']
 
 
