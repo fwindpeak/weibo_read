@@ -15,20 +15,28 @@ def getCardList(uid):
     for tab in data['data']['tabsInfo']['tabs']:
         if tab['title'] == '微博':
             containerid = tab['containerid']
-
-    url = url + "&containerid=%s" % (containerid)
-    data = requests.get(url).json()
-    for card in data['data']['cards']:
-        if card['card_type'] == 9:
-            yield processMblog(card['mblog'])
+    page = 0
+    while True:
+        page += 1
+        url = url + "&containerid=%s&page=%s" % (containerid, page)
+        data = requests.get(url).json()
+        cards = data['data']['cards']
+        if len(cards) < 1:
+            break
+        for card in cards:
+            if card['card_type'] == 9:
+                yield processMblog(card['mblog'])
 
 
 def processMblog(mblog):
+    create_at = mblog['created_at']
+    text = ''
     if mblog['isLongText'] is False:
-        return mblog['text']
+        text = mblog['text']
     else:
         url = URL_ROOT + "/statuses/extend?id=%s" % (mblog['id'])
-        return requests.get(url).json()['data']['longTextContent']
+        text = requests.get(url).json()['data']['longTextContent']
+    return "%s\n%s" % (create_at, text)
 
 
 def cleanText(text):
